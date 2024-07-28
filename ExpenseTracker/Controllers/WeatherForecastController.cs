@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using ExpenseTracker.Dto;
 
 namespace ExpenseTracker.Controllers
 {

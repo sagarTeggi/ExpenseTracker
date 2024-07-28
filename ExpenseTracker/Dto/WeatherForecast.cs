@@ -1,4 +1,4 @@
-namespace ExpenseTracker
+﻿namespace ExpenseTracker.Dto
 {
     public class WeatherForecast
     {
