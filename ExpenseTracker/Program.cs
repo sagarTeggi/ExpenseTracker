@@ -1,4 +1,4 @@
-using ExpenseTracker.DBContext;
+using ExpenseTracker.Data;
 using Microsoft.EntityFrameworkCore;
 
 internal class Program
