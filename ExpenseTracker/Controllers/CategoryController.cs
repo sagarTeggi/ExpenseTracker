@@ -26,8 +26,9 @@ namespace ExpenseTracker.Controllers
                 {
                     Id = requestDTO.Id,
                     CategoryName = requestDTO.CategoryName,
-                    CreatedTime = DateTime.UtcNow
-
+                    CreatedTime = DateTime.UtcNow,
+                    UpdateTime = null
+                    
                 };
                 //result = OK(CategoryService.AddCategory());
                 dbContext.Category.Add(obj);
