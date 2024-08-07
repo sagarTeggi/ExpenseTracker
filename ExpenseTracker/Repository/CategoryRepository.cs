@@ -1,5 +1,6 @@
 ﻿using ExpenseTracker.Data;
 using ExpenseTracker.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ExpenseTracker.Repository
 {
@@ -17,6 +18,14 @@ namespace ExpenseTracker.Repository
         {
             dBContext.Category.Add(category);
             dBContext.SaveChanges();
+        }
+
+        public async Task<List<Category>> FindAllCategoriesAsync()
+        {
+            var query = from Category category in dBContext.Category
+                        select category;
+
+            return await query.ToListAsync();
         }
 
     }

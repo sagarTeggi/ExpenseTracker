@@ -31,5 +31,20 @@ namespace ExpenseTracker.Service
             _logger.LogInformation("New category added successfully");
         }
 
+        public async Task<List<Category>> GetCategoriesAsync()
+        {
+            List<Category> cateogryList = [];
+            try
+            {
+                cateogryList = await CategoryRepository.FindAllCategoriesAsync();
+                _logger.LogInformation("Categories found {count}", cateogryList.Count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error occured while trying to fetch categories. Error msg: {ex}", ex.Message);
+            }
+                
+            return cateogryList;
+        }
     }
 }
