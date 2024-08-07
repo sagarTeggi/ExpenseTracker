@@ -10,7 +10,8 @@ namespace ExpenseTracker.Service
     {
 
         private readonly CategoryRepository CategoryRepository;
-        //private readonly ILogger<CategoryService> _logger =;
+
+        private static ILogger _logger { get => ExpenseTrackerLoggerFactory.GetStaticLogger<CategoryService>(); }
 
         public CategoryService(DBContext dbContext) 
         {
@@ -27,7 +28,7 @@ namespace ExpenseTracker.Service
             };
 
             CategoryRepository.AddCategory(newCategory);
-            //_logger.LogDebug("New category added successfully");
+            _logger.LogInformation("New category added successfully");
         }
 
     }

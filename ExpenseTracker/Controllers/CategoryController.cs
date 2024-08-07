@@ -11,12 +11,12 @@ namespace ExpenseTracker.Controllers
     [Route("[controller]")]
     public class CategoryController : Controller
     {
-        private readonly DBContext dbContext;
+        private readonly DBContext DbContext;
         private readonly ICategory category;
 
         public CategoryController(DBContext dbContext)
         {
-            this.dbContext = dbContext;
+            this.DbContext = dbContext;
             category = new CategoryService(dbContext);
         }
 

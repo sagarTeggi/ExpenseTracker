@@ -1,3 +1,4 @@
+using ExpenseTracker;
 using ExpenseTracker.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +26,9 @@ internal class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+
+        ExpenseTrackerLoggerFactory.Initialize(app.Services.GetRequiredService<ILoggerFactory>());
+        ILogger _logger = ExpenseTrackerLoggerFactory.GetStaticLogger<Program>();
 
         app.UseHttpsRedirection();
 
