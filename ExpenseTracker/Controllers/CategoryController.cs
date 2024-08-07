@@ -28,13 +28,7 @@ namespace ExpenseTracker.Controllers
 
             try
             {
-
-
                 category.AddCategory(requestDTO);
-
-
-                //result = OK(CategoryService.AddCategory());
-
                 result = StatusCode(200);
             }
             catch (Exception ex)

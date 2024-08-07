@@ -15,7 +15,8 @@ namespace ExpenseTracker.Repository
 
         public void AddCategory(Category category)
         {
-
+            dBContext.Category.Add(category);
+            dBContext.SaveChanges();
         }
 
     }
