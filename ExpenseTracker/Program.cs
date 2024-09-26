@@ -37,5 +37,7 @@ internal class Program
         app.MapControllers();
 
         app.Run();
+
+        //git init commmit from mac
     }
 }
