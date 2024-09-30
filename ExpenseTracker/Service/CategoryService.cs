@@ -1,35 +1,28 @@
-﻿using ExpenseTracker.Data;
-using ExpenseTracker.Dto;
-using ExpenseTracker.Interface;
+﻿using MongoDB.Driver;
+using Microsoft.Extensions.Options;
 using ExpenseTracker.Models;
-using ExpenseTracker.Repository;
+using ExpenseTracker.Data;
 
 namespace ExpenseTracker.Service
 {
-    public class CategoryService : ICategory
+    public class CategoryService
     {
+        private readonly IMongoCollection<Category> _categoriesCollection;
 
-        private readonly CategoryRepository CategoryRepository;
-
-        private static ILogger _logger { get => ExpenseTrackerLoggerFactory.GetStaticLogger<CategoryService>(); }
-
-        public CategoryService(DBContext dbContext) 
+        public CategoryService(IOptions<MongoDBSettings> dbSettings)
         {
-            CategoryRepository = new CategoryRepository(dbContext);
+            var mongoClient = new MongoClient(
+                dbSettings.Value.ConnectionString);
+
+            var mongoDatabase = mongoClient.GetDatabase(
+                dbSettings.Value.DatabaseName);
+
+            _categoriesCollection = mongoDatabase.GetCollection<Category>(
+                dbSettings.Value.CollectionName);
         }
 
-        public void AddCategory(CategoryRequestDTO requestDTO)
-        {
-
-            var newCategory = new Category()
-            {
-                CategoryName = requestDTO.CategoryName,
-                CreatedTime = DateTime.UtcNow,
-            };
-
-            CategoryRepository.AddCategory(newCategory);
-            _logger.LogInformation("New category added successfully");
-        }
+            public async Task<List<Category>> GetAsync() =>
+                await _categoriesCollection.Find(_ => true).ToListAsync();        
 
     }
 }

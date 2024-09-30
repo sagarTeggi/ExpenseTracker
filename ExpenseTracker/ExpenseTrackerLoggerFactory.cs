@@ -4,7 +4,7 @@ namespace ExpenseTracker
 {
     public static class ExpenseTrackerLoggerFactory
     {
-        private static ILoggerFactory _loggerFactory;
+        private static ILoggerFactory? _loggerFactory;
         private static ConcurrentDictionary<Type, ILogger> loggerByType = new();
 
         public static void Initialize(ILoggerFactory loggerFactory)
