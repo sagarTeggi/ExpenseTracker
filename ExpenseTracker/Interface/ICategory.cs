@@ -1,9 +1,12 @@
 ﻿using ExpenseTracker.Dto;
+using ExpenseTracker.Models;
 
 namespace ExpenseTracker.Interface
 {
     public interface ICategory
     {
-        public void AddCategory(CategoryRequestDTO requestDTO);
+        public List<Category> GetAllCategories();
+
+        public void AddCategory(Category category);
     }
 }

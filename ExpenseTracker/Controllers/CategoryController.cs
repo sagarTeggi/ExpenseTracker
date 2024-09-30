@@ -11,31 +11,45 @@ namespace ExpenseTracker.Controllers
     [Route("[controller]")]
     public class CategoryController(CategoryService categoryService) : Controller
     {
-        //private readonly DBContext DbContext;
-        //private readonly ICategory category;
-        private readonly CategoryService _booksService = categoryService;
-
-        // [HttpPost(Name = "Add")]
-        // public IActionResult AddCategoryController(CategoryRequestDTO requestDTO)
-        // {
-
-        //     IActionResult result;
-
-        //     try
-        //     {
-        //         category.AddCategory(requestDTO);
-        //         result = StatusCode(200);
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         result = StatusCode(500);
-        //     }
-
-        //     return result;
-        // }
+         private static ILogger _logger { get => ExpenseTrackerLoggerFactory.GetStaticLogger<CategoryController>(); }
+        private readonly CategoryService _categoryService = categoryService;
 
         [HttpGet]
-        public async Task<List<Category>> Get() =>
-            await _booksService.GetAsync();
+        public IActionResult Get()
+        { 
+            IActionResult result;
+            try
+            {
+                result = Ok (_categoryService.GetAllCategories());
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError("Error occured while trying to fetch Categories. ErrorMsg: {ex.InnerException}", ex.InnerException);
+                result = StatusCode(500);
+                
+            }
+            return result;
+        }
+
+        [HttpPost]
+        [Route("Add")]
+        public IActionResult AddCategoryController(Category request)
+        {
+            IActionResult result;
+            try
+            {
+                _categoryService.AddCategory(request);
+                result = Ok("Category added successfully");
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError("Error occured while trying to add Category {categoryName}. ErrorMsg: {ex.InnerException}", request.CategoryName,ex.InnerException);
+                result = StatusCode(500);
+            }
+
+            return result;
+        }
+     
     }
 }
