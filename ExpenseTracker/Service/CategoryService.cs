@@ -1,50 +1,47 @@
-﻿using ExpenseTracker.Data;
-using ExpenseTracker.Dto;
-using ExpenseTracker.Interface;
+﻿using MongoDB.Driver;
+using Microsoft.Extensions.Options;
 using ExpenseTracker.Models;
-using ExpenseTracker.Repository;
+using ExpenseTracker.Data;
+using ExpenseTracker.Interface;
 
 namespace ExpenseTracker.Service
 {
-    public class CategoryService : ICategory
+    public class CategoryService: ICategory
     {
-
-        private readonly CategoryRepository CategoryRepository;
-
+        private readonly IMongoCollection<Category> _categoriesCollection;
         private static ILogger _logger { get => ExpenseTrackerLoggerFactory.GetStaticLogger<CategoryService>(); }
 
-        public CategoryService(DBContext dbContext) 
+        public CategoryService(IOptions<MongoDBSettings> dbSettings)
         {
-            CategoryRepository = new CategoryRepository(dbContext);
+            var mongoClient = new MongoClient(
+                dbSettings.Value.ConnectionString);
+
+            var mongoDatabase = mongoClient.GetDatabase(
+                dbSettings.Value.DatabaseName);
+
+            _categoriesCollection = mongoDatabase.GetCollection<Category>(
+                dbSettings.Value.CollectionName);
         }
 
-        public void AddCategory(CategoryRequestDTO requestDTO)
+        public List<Category> GetAllCategories()
         {
-
-            var newCategory = new Category()
-            {
-                CategoryName = requestDTO.CategoryName,
-                CreatedTime = DateTime.UtcNow,
-            };
-
-            CategoryRepository.AddCategory(newCategory);
-            _logger.LogInformation("New category added successfully");
+            _logger.LogInformation("Fetching available categories");
+            return _categoriesCollection.Find(_ => true).ToList();
         }
-
-        public async Task<List<Category>> GetCategoriesAsync()
+        
+        public void AddCategory(Category request)
         {
-            List<Category> cateogryList = [];
-            try
+            _logger.LogInformation("Adding category:{categoryName}",request.CategoryName);
+            Category existingCategory = _categoriesCollection.Find(c => c.CategoryName.Equals(request.CategoryName)).FirstOrDefault();
+            if(existingCategory is null)
             {
-                cateogryList = await CategoryRepository.FindAllCategoriesAsync();
-                _logger.LogInformation("Categories found {count}", cateogryList.Count);
+                _categoriesCollection.InsertOne(request);
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError("Error occured while trying to fetch categories. Error msg: {ex}", ex.Message);
+                _logger.LogInformation("{categoryName} already available! Skipping current category",request.CategoryName);
             }
-                
-            return cateogryList;
+
         }
     }
 }

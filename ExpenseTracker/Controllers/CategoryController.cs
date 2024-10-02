@@ -9,53 +9,47 @@ namespace ExpenseTracker.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class CategoryController : Controller
+    public class CategoryController(CategoryService categoryService) : Controller
     {
-        private readonly DBContext DbContext;
-        private readonly ICategory CategoryService;
+         private static ILogger _logger { get => ExpenseTrackerLoggerFactory.GetStaticLogger<CategoryController>(); }
+        private readonly CategoryService _categoryService = categoryService;
 
-        public CategoryController(DBContext dbContext)
-        {
-            this.DbContext = dbContext;
-            CategoryService = new CategoryService(dbContext);
-        }
-
-        [HttpPost(Name = "Add")]
-        public IActionResult AddCategoryController(CategoryRequestDTO requestDTO)
-        {
-
+        [HttpGet]
+        public IActionResult Get()
+        { 
             IActionResult result;
-
             try
             {
-                CategoryService.AddCategory(requestDTO);
-                result = StatusCode(200);
+                result = Ok (_categoryService.GetAllCategories());
+
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
+                _logger.LogError("Error occured while trying to fetch Categories. ErrorMsg: {ex.InnerException}", ex.InnerException);
+                result = StatusCode(500);
+                
+            }
+            return result;
+        }
+
+        [HttpPost]
+        [Route("Add")]
+        public IActionResult AddCategoryController(Category request)
+        {
+            IActionResult result;
+            try
+            {
+                _categoryService.AddCategory(request);
+                result = Ok("Category added successfully");
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError("Error occured while trying to add Category {categoryName}. ErrorMsg: {ex.InnerException}", request.CategoryName,ex.InnerException);
                 result = StatusCode(500);
             }
 
             return result;
         }
-
-        [Route("List")]
-        [HttpGet]
-        public async Task<IActionResult> ListCategoriesAsync()
-        {
-            IActionResult result = null;
-
-            try
-            {
-                List<Category> categories = await CategoryService.GetCategoriesAsync();
-                result = Ok(categories);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
-            return result;
-        }
+     
     }
 }
