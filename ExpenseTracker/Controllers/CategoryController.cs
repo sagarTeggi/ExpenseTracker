@@ -15,6 +15,7 @@ namespace ExpenseTracker.Controllers
         private readonly CategoryService _categoryService = categoryService;
 
         [HttpGet]
+        [Route("GetCategories")]
         public IActionResult Get()
         { 
             IActionResult result;
@@ -45,6 +46,25 @@ namespace ExpenseTracker.Controllers
             catch(Exception ex)
             {
                 _logger.LogError("Error occured while trying to add Category {categoryName}. ErrorMsg: {ex.InnerException}", request.CategoryName,ex.InnerException);
+                result = StatusCode(500);
+            }
+
+            return result;
+        }
+
+        [HttpPost]
+        [Route("Update")]
+        public async Task<IActionResult> UpdateCategoryControllerAsync(Category request)
+        {
+            IActionResult result;
+            try
+            {
+                await _categoryService.UpdateCategoryAsync(request);
+                result = Ok("Category updated successfully");
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError("Error occured while trying to Update Category {ID}. ErrorMsg: {ex.InnerException}", request.Id, ex.InnerException);
                 result = StatusCode(500);
             }
 

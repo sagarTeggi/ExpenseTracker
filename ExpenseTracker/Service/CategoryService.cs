@@ -6,10 +6,10 @@ using ExpenseTracker.Interface;
 
 namespace ExpenseTracker.Service
 {
-    public class CategoryService: ICategory
+    public class CategoryService : ICategory
     {
         private readonly IMongoCollection<Category> _categoriesCollection;
-        private static ILogger _logger { get => ExpenseTrackerLoggerFactory.GetStaticLogger<CategoryService>(); }
+        private static ILogger Logger { get => ExpenseTrackerLoggerFactory.GetStaticLogger<CategoryService>(); }
 
         public CategoryService(IOptions<MongoDBSettings> dbSettings)
         {
@@ -25,13 +25,13 @@ namespace ExpenseTracker.Service
 
         public List<Category> GetAllCategories()
         {
-            _logger.LogInformation("Fetching available categories");
+            Logger.LogInformation("Fetching available categories");
             return _categoriesCollection.Find(_ => true).ToList();
         }
         
         public void AddCategory(Category request)
         {
-            _logger.LogInformation("Adding category:{categoryName}",request.CategoryName);
+            Logger.LogInformation("Adding category:{categoryName}",request.CategoryName);
             Category existingCategory = _categoriesCollection.Find(c => c.CategoryName.Equals(request.CategoryName)).FirstOrDefault();
             if(existingCategory is null)
             {
@@ -39,8 +39,17 @@ namespace ExpenseTracker.Service
             }
             else
             {
-                _logger.LogInformation("{categoryName} already available! Skipping current category",request.CategoryName);
+                Logger.LogInformation("{categoryName} already available! Skipping current category",request.CategoryName);
             }
+
+        }
+
+        public async Task<UpdateResult> UpdateCategoryAsync(Category request)
+        {
+            var filter = Builders<Category>.Filter.Eq(c => c.Id, request.Id);
+            var update = Builders<Category>.Update.Set(c => c.CategoryName, request.CategoryName);
+
+            return await _categoriesCollection.UpdateOneAsync(filter, update);
 
         }
     }
